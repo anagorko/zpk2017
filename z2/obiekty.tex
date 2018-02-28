@@ -1,0 +1,368 @@
+\documentclass[pdftex, smaller]{beamer}
+\usepackage{graphicx}
+\usepackage{listings}
+
+\setlength{\rightskip}{0pt} % I want justifed text
+\sloppy
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+
+\newcommand{\F}[1]{{\protect\mathcal{F}_{#1}}}
+\newcommand{\G}[1]{{\protect\mathcal{G}_{#1}}}
+\newcommand{\U}[1]{{\protect\mathcal{U}_{#1}}}
+\newcommand{\V}[1]{{\protect\mathcal{V}_{#1}}}
+\DeclareMathOperator{\mesh}{mesh}
+\DeclareMathOperator{\ulim}{ulim}
+\DeclareMathOperator{\asdim}{asdim}
+\DeclareMathOperator{\udim}{udim}
+\DeclareMathOperator{\mult}{mult}
+
+\mode<presentation> {
+  \usetheme{Berkeley}
+  \setbeamercovered{highly dynamic}
+}
+
+\usepackage[english]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage{times}
+\usepackage[T1]{fontenc}
+
+\lstset{language=C++,
+                basicstyle=\ttfamily\footnotesize,
+                keywordstyle=\color{blue}\ttfamily,
+                stringstyle=\color{red}\ttfamily,
+                commentstyle=\color{green}\ttfamily,
+                morecomment=[l][\color{magenta}]{\#}
+}
+
+\author{ZPK 2016}
+
+\title[Obiekty i klasy]
+{Obiekty i klasy}
+
+\date{8 marca 2017}
+
+\begin{document}
+
+\begin{frame}
+  \titlepage
+
+  \begin{center}
+    oraz paradygmat programowania obiektowego.
+  \end{center}
+\end{frame}
+
+\begin{frame}
+\frametitle{Zanim zaczniemy}
+
+Kilka uwag o stylu kodowania.
+
+\vspace{2mm}
+\url{http://courses.cms.caltech.edu/cs11/material/cpp/donnie/cppstyle.html}
+
+\vspace{2mm}
+\begin{itemize}
+\item Prawidłowo rozmieszczaj spacje
+\item Konsekwentnie rozmieszczaj nawiasy klamrowe
+\item Używaj nawiasów klamrowych jeżeli instrukcja zajmuje więcej niż jedną linię.
+\item Używaj wcięć
+\item Zwróć uwagę na szerokość tekstu
+\item Używaj nawiasów do oznaczenia kolejności działań
+\item Wykorzystuj puste linie do oddzielenia bloków kodu
+\item Pisz komentarze
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}
+\frametitle{Klasy i obiekty}
+
+Obiekt łączy w sobie:
+
+\begin{itemize}
+  \item \emph{stan} - konkretny zestaw danych
+  \item \emph{zachowanie} - kod działający na tych danych
+  \item obiekt = dane + kod
+\end{itemize}
+
+\vspace{8mm}
+Klasa to sztanca, za pomocą której formowane są obiekty.
+
+\vspace{8mm}
+Każda klasa definiuje nowy typ w programie.
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Minimalny przykład}
+
+\begin{lstlisting}
+class Point
+{
+};
+
+int main()
+{
+    Point p;
+}
+\end{lstlisting}
+
+Oczywiście obiekty tak zadeklarowanej klasy Point są puste i nie można nic sensownego z nimi zrobić. Ale powyższy kod się skompiluje.
+
+\end{frame}
+
+\begin{frame}
+
+\begin{itemize}
+\item Klasa składa się ze składowych (\emph{members}).
+\item Składowymi są albo dane (zmienne) albo metody (funkcje).
+\item Dane przechowują stan klasy; metody pozwalają ten stan modyfikować (określają zachowanie klasy)
+\item Można tworzyć wiele obiektów z danej klasy. Każdy ma swój zestaw zmiennych (danych - stan).
+\item Wywoływanie metod obiektu zmienia stan wyłącznie tego obiektu, nie zmieniając stanów innych obiektów z danej klasy (są wyjątki - składowe statyczne).
+\item Pojedyncze obiekty nazywamy instancjami danej klasy.
+\item Klasa nie jest obiektem.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Dane i ich inicjalizacja}
+
+\begin{lstlisting}
+class Point
+{
+    double x,y;
+    
+public:
+    Point(double _x, double _y) {
+    	x = _x;
+	y = _y;
+    }
+};
+\end{lstlisting}
+
+\begin{itemize}
+\item Sekcje publiczne i prywatne
+\item Zazwyczaj chcemy ukryć zmienne klasy
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}
+\frametitle{Konstruktory i destruktory}
+
+\begin{itemize}
+\item Konstruktor tworzy nową instancję klasy.
+\item Konstruktor może mieć argumenty, ale nie musi. Konstruktor bezargumentowy to konstruktor domyślny.
+\item Konstruktor nie zwraca żadnej wartości.
+\item Może być wiele konstruktorów, zawsze jest przynajmniej jeden.
+\end{itemize}
+
+\begin{itemize}
+\item Destruktor "sprząta" po obiekcie.
+\item Nie ma parametrów i nie zwraca wartości.
+\item Jest tylko jeden destruktor.
+\end{itemize}
+
+Destruktory zaczną nam  być potrzebne dopiero, gdy zaczniemy umieszczać obiekty na stercie.
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Jak modyfikować wartości zmiennych?}
+
+Zmienne są w sekcji prywatnej - jak je modyfikować?
+
+\begin{lstlisting}
+class Point
+{
+	double x,y;
+    
+public:
+	double getX() { return x; }
+	double getY() { return y; }
+	
+	void setX(double _x) { x = _x; }
+	void setY(double _y) { y = _y; }
+};
+\end{lstlisting}
+
+\end{frame}
+
+\begin{frame}
+\frametitle{Metody}
+
+\begin{itemize}
+\item Metody dostępowe
+
+\vspace{2mm}
+Umożliwiają odczytanie stanu obiektu.
+\item Metody ustawiające
+
+\vspace{2mm}
+Umożliwiają ustawienie stanu obiektu.
+
+\item Metody modyfikujące
+
+\vspace{2mm}
+Metody umożliwiające działanie na obiekcie.
+
+\item Modyfikatory private:, protected: i public:
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}
+
+\begin{center}
+\Large Projektowanie klas
+\end{center}
+\end{frame}
+
+\begin{frame}
+\frametitle{Myślenie obiektowe}
+
+\begin{itemize}
+\item Uchwycenie istotnych cech obiektu (abstraction)
+
+\vspace{8mm}
+\item Oddzielenie funkcjonalności od implementacji (encapsulation)
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Proste na płaszczyźnie}
+
+Chcemy utworzyć klasę, której obiekty reprezentują proste na płaszczyźnie.
+
+\vspace{2mm}
+Chcemy móc sprawdzać równoległość i wyznaczać punkt przecięcia dwóch prostych.
+
+\vspace{2mm}
+\begin{lstlisting}
+class Line
+{
+public:
+	bool parallelTo(Line);
+	Point intersectionWith(Line);
+};
+\end{lstlisting}
+
+(Powyższa klasa jest niepełna - brak implementacji metod i zmiennych klasy. Uwaga na różnicę pomiędzy deklaracją i definicją funkcji/metody.)
+\end{frame}
+
+\begin{frame}
+\frametitle{Jak implementować klasę Line?}
+
+Musimy zdecydować, jak reprezentować nasze proste.
+\vspace{6mm}
+
+\begin{enumerate}
+\item Pamiętając współczynniki $A, B, C$ równania $Ax + By + C = 0$?
+
+\vspace{4mm}
+\item Pamiętając parę punktów $P, Q$, przez które przechodzi prosta?
+
+\vspace{4mm}
+\item Pamiętając punkt zaczepienia $P$ i wektor kierunkowy $v$ prostej?
+\end{enumerate}
+
+\end{frame}
+
+\begin{frame}
+\frametitle{Jak implementować klasę Line?}
+
+Zwróć uwagę, że już samo pytanie o \emph{równość} dwóch prostych nie jest łatwe w żadnej z tych reprezentacji.
+
+\vspace{4mm}
+Szczegóły implementacji metod parallelTo i intersectionWith są zupełnie inne w każdym przypadku.
+
+\vspace{4mm}
+Nie jest to jednak istotne dla użytkownika klasy (jak długo umie on tworzyć i modyfikować obiekty tej klasy).
+
+\vspace{4mm}
+Do klasy Line wrócimy na następnych zajęciach
+\end{frame}
+
+
+\begin{frame}
+
+\begin{center}
+\Large Implementacja klas
+\end{center}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Implementacja klasy Point}
+
+\begin{lstlisting}
+class Point
+{
+    double x, y;
+
+public:
+    Point();
+    Point(double, double);
+
+    ~Point();
+
+    void setX(double);
+    void setY(double);
+
+    double getX();
+    double getY();
+
+    friend istream& operator>>(istream&, Point&);
+};
+
+ostream& operator<<(ostream &, Point);
+istream& operator>>(istream &, Point&);
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}
+\frametitle{Wskaźniki kontra referencje}
+
+Metody obiektu zawsze przekazują zmienne przez wartość.
+
+\vspace{8mm}
+By oszczędzić na kopiowaniu używamy referencji.
+
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Operatory << i >>}
+
+\begin{lstlisting}
+ostream& operator<<(ostream &o, Point p)
+{
+    o << "(" << p.getX() << "," << p.getY() << ")";
+
+    return o;
+}
+
+istream& operator>>(istream &i, Point &p)
+{
+    i >> p.x;
+    i >> p.y;
+
+    return i;
+}
+\end{lstlisting}
+
+\end{frame}
+
+\begin{frame}[fragile]{Zadanie}
+
+\begin{lstlisting}
+class Plane {
+public:
+	Plane(Point A, Point B, Point C);
+	moveTo(Point P);
+	distanceFrom(Point P);
+	parallelTo(Plane &P);
+};
+\end{lstlisting}
+
+\end{frame}
+
+\end{document}
