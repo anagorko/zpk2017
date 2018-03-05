@@ -1,0 +1,164 @@
+#include <iostream>
+#include<math.h>
+
+
+using namespace std;
+
+class Point
+{
+	float x,y;
+
+public:
+	// tworzymy punkt o zadanych wspó³rzêdnych
+	Point(float x, float y) {
+		setX(x);
+		setY(y);
+	}
+	// tworzymy punkt na œrodku pomiêdzy dwoma innymi
+	Point(Point A, Point B) {
+		x = (A.getX() + B.getX()) / 2;
+		y = (A.getY() + B.getY()) / 2;
+	}
+
+	float dist(Point);	// obliczamy odleg³oœæ od drugiego punktu
+
+	float getX() { return x; }
+	float getY() { return y; }
+
+	void setX(float _x) { x = _x; }
+	void setY(float _y) { y = _y; }
+};
+
+float Point::dist(Point B)
+{
+	return sqrt((x-B.x)*(x-B.x) + (y-B.y)*(y-B.y));
+}
+
+class Line
+{
+	float A,B,C;
+
+public:
+	Line(float _A, float _B, float _C) : A(_A), B(_B), C(_C) {}
+	// u¿yliœmy tu listy inicjalizacyjnej
+
+	Line(Point, Point);
+
+	Point intersection(Line l);
+};
+
+Line::Line(Point P, Point Q)
+{
+	float ux = P.getX() - Q.getX();
+	float uy = P.getY() - Q.getY();
+
+	A = -uy;
+	B = ux;		// wspó³czynniki tworz¹ wektor prostopad³y do wektora PQ
+
+	C = -(A * P.getX() + B * P.getY()); // dobieramy C tak, by punkt P le¿a³ na prostej
+}
+
+Point Line::intersection(Line l)
+{
+	// wyznacznik macierzy
+	// A B
+	// l.A l.B
+
+	float W = A * l.B - B * l.A;
+
+	// wyznacznik macierzy
+	// -C B
+	// -l.C l.B
+	float Wx = -C*l.B + l.C*B;
+
+	// wyznacznik macierzy
+	// A -C
+	// l.A -l.C
+	float Wy = -A*l.C + C*l.A;
+
+	// co, gdy W == 0?
+	// (zwracamy nienazwany obiekt)
+	return Point(Wx/W, Wy/W);
+}
+
+class Circle
+{
+    float R;
+    float x;
+    float y;
+
+    public:
+
+        //Punkty trojkata
+        Circle(Point, Point, Point);
+        // promien i srodek kola?
+        Circle(Point, float);
+
+        //2. Wyznacz œrodek i promieñ okrêgu opisanego na tym trójk¹cie.
+        Point getCenter();
+        float getRadius();
+        //string getEquation(); ????????????
+};
+
+Circle::Circle(Point A, float _r)
+{
+    R = _r;
+    x = A.getX();
+    y = A.getY();
+
+}
+
+Circle::Circle(Point A, Point B, Point C)
+{
+    Point Bp(A,C);	// srodek boku AC
+	Point Ap(B,C);
+
+	Line sb(B,Bp);	// srodkowa z wierzcholka B
+	Line sa(A,Ap);
+
+	Point S = sa.intersection(sb);
+
+	x = S.getX();
+	y = S.getY();
+	R = sqrt((x-B.getX())*(x-B.getX()) + (y-B.getY())*(y-B.getY()));
+}
+
+float Circle::getRadius()
+{
+    return R;
+}
+
+Point Circle::getCenter()
+{
+    return Point(x,y);
+}
+
+int main()
+{
+	Line k(2,-3,4);
+	Line l(1,1,-10);
+	Point X(0,0);
+	Point Y(-1,5);
+	Line m(X,Y);
+
+	Point A = k.intersection(l);
+	Point B = l.intersection(m);
+	Point C = m.intersection(k);
+
+	Point Bp(A,C);	// srodek boku AC
+	Point Ap(B,C);
+
+	Line sb(B,Bp);	// srodkowa z wierzcholka B
+	Line sa(A,Ap);
+
+	Point S = sa.intersection(sb);
+
+	cout << "S(" << S.getX() << "," << S.getY() << ")" << endl;
+
+	Circle O(A,B,C);
+	cout << O.getRadius() << endl;
+	Point Center =  O.getCenter();
+	cout << "Center(" << Center.getX() << "," << Center.getY() << ")" << endl;
+
+	return 0;
+}
