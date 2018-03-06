@@ -2,28 +2,13 @@
 #include<math.h>
 using namespace std;
 
-// punkty
-//   tworzenie
-//   środek
-//   odległość
-
-// proste
-//   tworzenie z równania
-//   tworzenie z dwóch punktów
-//   przecięcie
-
-// okręgi
-//   tworzenie z trzech punktów
-//   tworzenie ze środka i promienia
-//   wyznaczanie środka
-//   wyznaczanie promienia
-//   wyznaczanie równania
-
 class Point
 {
 	float x,y;
 
 public:
+	Point(){}
+
 	// tworzymy punkt o zadanych współrzędnych
 	Point(float x, float y) {
 		setX(x);
@@ -60,10 +45,22 @@ public:
 	Line(float _A, float _B, float _C) : A(_A), B(_B), C(_C) {}
 	// użyliśmy tu listy inicjalizacyjnej
 
+	Line(Line, Point); // DODANE - tworzy prostą równoległą do danej i przechodzącą przez dany punkt
 	Line(Point, Point);
 
 	Point intersection(Line l);
+
+
 };
+
+Line::Line(Line l, Point P) // DODANE
+{
+	A = -l.B;
+	B = l.A;	// kierunek prostopadły
+
+
+	C = -(A*P.getX()+B*P.getY()); // punkt P leży na prostej
+}
 
 Line::Line(Point P, Point Q)
 {
@@ -101,6 +98,9 @@ Point Line::intersection(Line l)
 
 class Circle
 {
+	Point S; // DODANE - środek
+	float r; // DODANE - promień
+
 public:
 	Circle(Point, Point, Point);
 	Circle(Point, float);
@@ -109,6 +109,33 @@ public:
 	float getRadius();
 	string getEquation();
 };
+
+// DODANE - implementacja metod klasy Circle
+Circle::Circle(Point A, Point B, Point C)
+{
+	Point Cp = Point(A,B);
+	Point Ap = Point(B,C); // srodki bokow
+
+	Line SAB = Line(Line(A,B),Cp); // symetralna boku AB
+	Line SBC = Line(Line(B,C),Ap); // symetralna boku BC
+
+	S = SAB.intersection(SBC); // srodek - punkt przeciecia symetralnych
+
+	r = S.dist(A); // promien - odleglosc srodka od wierzcholka
+}
+
+Circle::Circle(Point _S, float _r)
+{
+	S=_S; r=_r;
+}
+Point Circle::getCenter()
+{
+	return S;
+}
+float Circle::getRadius()
+{
+	return r;
+}
 
 int main()
 {
