@@ -1,0 +1,82 @@
+#include<iostream>
+
+using namespace std;
+
+class Point
+{
+	float x,y;
+
+public:
+	Point(float x, float y) {
+		setX(x);
+		setY(y);
+	}
+
+	float getX() const { return x; }
+	float getY() const { return y; }
+
+	void setX(float _x) { x = _x; }
+	void setY(float _y) { y = _y; }
+};
+
+class Line
+{
+	float A,B,C;
+
+public:
+	Line(float _A, float _B, float _C) : A(_A), B(_B), C(_C) {}
+
+
+	// WYMAGANE W ZADANIU
+	Point operator*(const Line &) const; // znajduje punkt przecięcia dwóch prostych
+  bool operator||(const Line &) const; // testuje równoległość dwóch prostych
+  bool operator==(const Line &) const; // sprawdza równość dwóch prostych
+  friend ostream& operator<<(ostream&, const Point&); //wyswietla punkt bedacy rozwiazaniem ukladu
+};
+
+Point Line::operator*(const Line & L) const{
+
+  float W = A * L.B - B * L.A;
+	float Wx = -C*L.B + L.C*B;
+	float Wy = -A*L.C + C*L.A;
+
+	return Point(Wx/W, Wy/W);
+}
+
+bool Line::operator||(const Line &L) const{
+    if(A*L.B==L.A*B) return true;
+    else return false;
+}
+
+bool Line::operator==(const Line &L) const{
+    if(B/A==L.B/L.A && C/A==L.C/L.A) return true;
+    else return false;
+}
+
+ostream& operator<<(ostream& os, const Point& P){
+    return os << "P(" << P.getX() << ";" << P.getY() << ")";
+}
+
+int main()
+{
+    float a,b,c;
+
+    cout << "Podaj wspolczynniki pierwszego rownania (ax+by=c): ";
+    cin >> a >> b >> c;
+    Line k(a,b,-c);
+
+
+    cout << "Podaj wspolczynniki drugiego rownania (ax+by=c): ";
+    cin >> a >> b >> c;
+
+    Line l(a,b,-c);
+
+    if (k == l) {
+      cout << "Istnieje nieskonczenie wiele rozwiazan." << endl;
+    } else if (k || l) {
+      cout << "Uklad jest sprzeczny." << endl;
+    } else {
+      cout << "Rozwiazanie ukladu to " << (k*l) << endl;
+    }
+    return 0;
+}
