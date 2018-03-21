@@ -1,0 +1,212 @@
+#include<string>
+#include<iostream>
+#include<fstream>
+#include<vector>
+#include<algorithm>
+using namespace std;
+
+class Person
+{
+    int id;
+    string name;
+    string surname;
+    string phone;
+    string email;
+
+public:
+	Person(){}; //(string _name, string _surname, string _phone, string _email) {
+        //name=_name;   surname=_surname;  phone=_phone; phone=_phone;
+	//}
+
+	void setName(string _name){ name=_name; }
+
+	void setSurname(string _surname){ surname=_surname; }
+
+	void setPhone(string _phone){ phone=_phone; }
+
+	void setEmail(string _email){ email=_email; }
+
+	void setId(int _id){ id=_id; }
+
+	string getName() const { return name; }
+	string getSurname() const { return surname; }
+	string getPhone() const { return phone; }
+	string getEmail() const { return email; }
+	int getId() const { return id; }
+
+	bool operator<(const Person& p) const {
+		return name < p.name;
+	}
+
+	friend ostream& operator<<(ostream&, const Person&);
+	friend istream& operator>>(istream&, Person&);
+};
+
+ostream& operator<<(ostream& os, const Person& P){
+    //return os << P.getName() << ", " << P.getSurname() << ", " << P.getPhone() << ", " << P.getEmail();
+    return os << P.getId() << " " << P.getName() << " " << P.getSurname() << " " << P.getPhone() << " " << P.getEmail() <<endl;
+}
+
+istream& operator>>(istream& is, Person& P){
+     //is >> P.name;
+     is >> P.id >> P.name >> P.surname  >> P.phone  >> P.email;
+     return is;
+}
+
+class Addressbook
+{
+	vector<Person> p;
+
+	int getFreeId()
+	{
+		int max_id = 0;
+		for (auto &r: p) {
+			if (r.getId() > max_id) { max_id = r.getId(); }
+		}
+		return max_id+1;
+	}
+
+public:
+	Addressbook() {}
+
+	void read(string filename) {
+		Person r;
+
+		fstream f;
+		f.open(filename, ios::in);
+
+		while (f>>r) {
+			p.push_back(r);
+		}
+		f.close();
+	}
+
+	void write(string filename) {
+		fstream f;
+
+		f.open(filename, ios::out | ios::trunc);
+
+		for (auto& r: p) {
+			f << r;
+		}
+		f.close();
+	}
+
+	void add(Person &r) {
+		r.setId(getFreeId());
+		p.push_back(r);
+	}
+
+	void remove(int id) {
+		for (auto i = p.begin(); i < p.end(); i++) {
+			if (i -> getId() == id) {
+				p.erase(i); return;
+			}
+		}
+	}
+
+	Person& get(int id) {
+		for (auto &r: p) {
+			if (r.getId() == id) return r;
+		}
+		Person r;
+		r.setId(id);
+		p.push_back(r);
+		return p.back();
+	}
+
+	vector<Person>& getAll() { return p; }
+};
+
+string rekord(int liczba)
+{
+	if (liczba == 0 || liczba >= 5) {
+		return "rekordów";
+	} else if (liczba == 1) {
+		return "rekord";
+	} else {
+		return "rekordy";
+	}
+}
+
+void askForData(Person &p)
+{
+	string tmp;
+	getline(cin,tmp);
+
+	cout << "Podaj imie: ";
+	if (p.getName() != "") { cout << "[" << p.getName() << "] "; }
+	getline(cin,tmp); if (tmp != "") { p.setName(tmp); }
+
+	cout << "Podaj nazwisko: ";
+	if (p.getSurname() != "") { cout << "[" << p.getSurname() << "] "; }
+	getline(cin,tmp); if (tmp != "") { p.setSurname(tmp); }
+
+	cout << "Podaj telefon: ";
+	if (p.getPhone() != "") { cout << "[" << p.getPhone() << "] "; }
+	getline(cin,tmp); if (tmp != "") { p.setPhone(tmp); }
+
+	cout << "Podaj email: ";
+	if (p.getEmail() != "") { cout << "[" << p.getEmail() << "] "; }
+	getline(cin,tmp); if (tmp != "") { p.setEmail(tmp); }
+}
+
+int main(int argc, char* argv[])
+{
+	string filename;
+
+	cout << "Istniejaca nazwa - edycja, Nowa nazwa - nowy plik" << endl;
+	cout << "Podaj nazwe ksiazki adresowej: ";
+	cin >> filename;
+	cout << endl << "Mozliwe do wykonania akcje: add, list, modify, remove, sort i quit" << endl;
+
+	Addressbook a;
+	a.read(filename);
+
+	cout << endl << "Odczytalem " << a.getAll().size() << " " << rekord(a.getAll().size()) << "." << endl;
+
+
+	while(true) {
+		string cmd;
+
+		cout << "Akcja: "; cin >> cmd;
+
+		if (cmd == "list") {
+			string tmp; getline(cin, tmp);
+
+			vector<Person>& p = a.getAll();
+			for (const auto &r: p) {
+				cout << r.getId() << ": Imie: " << r.getName() << ", Nazwisko: " << r.getSurname() << ", Nr telefonu: "
+				     << r.getPhone() << ", E-mail: " << r.getEmail() << endl;
+			}
+
+		} else if (cmd == "add") {
+			Person r;
+			askForData(r);
+			a.add(r);
+		} else if (cmd == "modify") {
+			int id;
+			cout << "Podaj nr ID osoby: ";
+			cin >> id;
+			Person &r = a.get(id);
+			askForData(r);
+		} else if (cmd == "remove") {
+			int id;
+			cin >> id;
+			a.remove(id);
+		} else if (cmd == "quit") {
+			break;
+		} else if (cmd == "sort") {
+			sort(a.getAll().begin(), a.getAll().end());
+		} else {
+			cout << "Podaj instrukcjê: list, add, modify, remove, sort, quit" << endl;
+		}
+
+	}
+
+	a.write(filename);
+
+	cout << "Zapisa³em " << a.getAll().size() << " " << rekord(a.getAll().size()) << "." << endl;
+
+	return 0;
+}
