@@ -36,12 +36,12 @@
                 morecomment=[l][\color{magenta}]{\#}
 }
 
-\author{ZPK 2016}
+\author{ZPK 2017}
 
 \title[Obiekty i klasy]
 {Obiekty i klasy}
 
-\date{8 marca 2017}
+\date{28 lutego 2017}
 
 \begin{document}
 
@@ -51,28 +51,6 @@
   \begin{center}
     oraz paradygmat programowania obiektowego.
   \end{center}
-\end{frame}
-
-\begin{frame}
-\frametitle{Zanim zaczniemy}
-
-Kilka uwag o stylu kodowania.
-
-\vspace{2mm}
-\url{http://courses.cms.caltech.edu/cs11/material/cpp/donnie/cppstyle.html}
-
-\vspace{2mm}
-\begin{itemize}
-\item Prawidłowo rozmieszczaj spacje
-\item Konsekwentnie rozmieszczaj nawiasy klamrowe
-\item Używaj nawiasów klamrowych jeżeli instrukcja zajmuje więcej niż jedną linię.
-\item Używaj wcięć
-\item Zwróć uwagę na szerokość tekstu
-\item Używaj nawiasów do oznaczenia kolejności działań
-\item Wykorzystuj puste linie do oddzielenia bloków kodu
-\item Pisz komentarze
-\end{itemize}
-
 \end{frame}
 
 \begin{frame}
@@ -130,10 +108,10 @@ Oczywiście obiekty tak zadeklarowanej klasy Point są puste i nie można nic se
 \begin{lstlisting}
 class Point
 {
-    double x,y;
+    float x,y;
     
 public:
-    Point(double _x, double _y) {
+    Point(float _x, float _y) {
     	x = _x;
 	y = _y;
     }
@@ -148,7 +126,7 @@ public:
 \end{frame}
 
 \begin{frame}
-\frametitle{Konstruktory i destruktory}
+\frametitle{Konstruktory}
 
 \begin{itemize}
 \item Konstruktor tworzy nową instancję klasy.
@@ -157,13 +135,6 @@ public:
 \item Może być wiele konstruktorów, zawsze jest przynajmniej jeden.
 \end{itemize}
 
-\begin{itemize}
-\item Destruktor "sprząta" po obiekcie.
-\item Nie ma parametrów i nie zwraca wartości.
-\item Jest tylko jeden destruktor.
-\end{itemize}
-
-Destruktory zaczną nam  być potrzebne dopiero, gdy zaczniemy umieszczać obiekty na stercie.
 \end{frame}
 
 \begin{frame}[fragile]
@@ -174,14 +145,14 @@ Zmienne są w sekcji prywatnej - jak je modyfikować?
 \begin{lstlisting}
 class Point
 {
-	double x,y;
+	float x,y;
     
 public:
-	double getX() { return x; }
-	double getY() { return y; }
+	float getX() { return x; }
+	float getY() { return y; }
 	
-	void setX(double _x) { x = _x; }
-	void setY(double _y) { y = _y; }
+	void setX(float _x) { x = _x; }
+	void setY(float _y) { y = _y; }
 };
 \end{lstlisting}
 
@@ -280,89 +251,7 @@ Szczegóły implementacji metod parallelTo i intersectionWith są zupełnie inne
 Nie jest to jednak istotne dla użytkownika klasy (jak długo umie on tworzyć i modyfikować obiekty tej klasy).
 
 \vspace{4mm}
-Do klasy Line wrócimy na następnych zajęciach
-\end{frame}
-
-
-\begin{frame}
-
-\begin{center}
-\Large Implementacja klas
-\end{center}
-\end{frame}
-
-\begin{frame}[fragile]
-\frametitle{Implementacja klasy Point}
-
-\begin{lstlisting}
-class Point
-{
-    double x, y;
-
-public:
-    Point();
-    Point(double, double);
-
-    ~Point();
-
-    void setX(double);
-    void setY(double);
-
-    double getX();
-    double getY();
-
-    friend istream& operator>>(istream&, Point&);
-};
-
-ostream& operator<<(ostream &, Point);
-istream& operator>>(istream &, Point&);
-\end{lstlisting}
-\end{frame}
-
-\begin{frame}
-\frametitle{Wskaźniki kontra referencje}
-
-Metody obiektu zawsze przekazują zmienne przez wartość.
-
-\vspace{8mm}
-By oszczędzić na kopiowaniu używamy referencji.
-
-\end{frame}
-
-\begin{frame}[fragile]
-\frametitle{Operatory << i >>}
-
-\begin{lstlisting}
-ostream& operator<<(ostream &o, Point p)
-{
-    o << "(" << p.getX() << "," << p.getY() << ")";
-
-    return o;
-}
-
-istream& operator>>(istream &i, Point &p)
-{
-    i >> p.x;
-    i >> p.y;
-
-    return i;
-}
-\end{lstlisting}
-
-\end{frame}
-
-\begin{frame}[fragile]{Zadanie}
-
-\begin{lstlisting}
-class Plane {
-public:
-	Plane(Point A, Point B, Point C);
-	moveTo(Point P);
-	distanceFrom(Point P);
-	parallelTo(Plane &P);
-};
-\end{lstlisting}
-
+Przyjrzyjmy się lepiej temu przykładowi rozwiązując dwa zadania z liceum.
 \end{frame}
 
 \end{document}

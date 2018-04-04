@@ -1,0 +1,108 @@
+#include <iostream>
+#include<stdlib.h>
+using namespace std;
+
+class Stack
+{
+    class Element
+    {
+        public:
+            Element* prev;
+            float value;
+    };
+public:
+    Element* t;
+
+
+    Stack();    // inicjalizuje pusty stos
+    ~Stack();   // kasuje wszystkie elementy
+
+    void pop();   // kasuje gorny element stosu
+    float top();  // zwraca wartosc na gorze stosu
+
+    bool empty();     // true = stos jest pusty
+    void push(float); // umieszcza wartosc na wierzcholku stosu
+};
+
+Stack::Stack(){
+    t = new Element;
+}
+
+Stack::~Stack(){
+    delete this->t;
+}
+
+void Stack::pop(){
+    t=t->prev;
+}
+
+float Stack::top(){
+    return t->value;
+}
+
+bool Stack::empty(){
+    if (this->top()==0) return true;
+    else return false;
+}
+
+void Stack::push(float x){
+    Element* A;
+    A=new Element;
+    A=t;
+
+    t=new Element;
+    t->value=x;
+    t->prev=A;
+
+    delete A;
+}
+
+/*
+int main()
+{
+    Stack s; //deklaracja stosu
+    cout << s.empty() << endl; //sprawdzenie czy pusty - powinien byc pusty czyli 1
+    s.push(5); // dolozenie 5
+    cout << s.top() << endl; // sprawdzenie czy 5 jest na gorze
+    s.push(10); // dolozenie 10
+    cout << s.top() << endl; // sprawdzenie czy 10 jest na gorze
+    s.pop(); //usuniecie wiercholka czyli 10
+    cout << s.top() << endl; //sprawdzenie czy 5 jest na gorze
+    cout << s.empty() << endl ; // sprawdzenie czy pusty (Powinien byc pelny czyli 0)
+    s.pop(); // usuniecie wierzcholka czyli 5
+    cout << s.empty(); //sprawdzenie - powinien byc pusty czyli 1
+
+    return 0;
+}
+*/
+
+
+int main()
+{
+    Stack s;
+
+    while (!cin.eof()) {
+        string token;
+        cin >> token;
+
+        if (token == "+") {
+            float l, r;
+
+            r = s.top(); s.pop();
+            l = s.top(); s.pop();
+
+            s.push(l + r);
+        } else if (token == "*") {
+            float l, r;
+
+            r = s.top(); s.pop();
+            l = s.top(); s.pop();
+
+            s.push(l * r);
+        } else if (token == "=") {
+            cout << s.top() << endl;
+        } else {
+            s.push(atof(token.c_str()));
+        }
+    }
+}

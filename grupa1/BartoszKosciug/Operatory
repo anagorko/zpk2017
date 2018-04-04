@@ -1,0 +1,57 @@
+#include <iostream>
+
+using namespace std;
+
+class Ulamek {
+  int l, m; // licznik , mianownik
+public:
+  Ulamek ();
+  Ulamek(int _l, int _m);
+  Ulamek& operator+=(const Ulamek &w);
+  Ulamek operator+(const Ulamek &w);
+  friend ostream& operator<<(ostream& os, const Ulamek &w);
+  int getL() const {
+    return l;
+  }
+  int getM() const {
+    return m;
+  }
+};
+
+Ulamek::Ulamek(int _l, int _m){
+
+    l = _l;
+    m = _m;
+}
+
+Ulamek Ulamek::operator+(const Ulamek &w){
+
+
+
+    l = getL()*w.getM() + w.getL()*getM();
+    m = getM()*w.getM();
+
+    return Ulamek(l,m);
+
+}
+
+Ulamek& Ulamek::operator+=(const Ulamek &w){
+
+    l = getL()*w.getM() + w.getL()*getM();
+    m = getM()*w.getM();
+
+    return *this;
+}
+
+ostream& operator<<(ostream& os, const Ulamek &w){
+
+    os << w.getL() << " / " << w.getM();
+    return os;
+
+}
+
+
+int main()
+{
+   Ulamek a(3,8), b(1,8); cout << (a + b) << endl;
+}
