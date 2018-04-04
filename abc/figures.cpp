@@ -140,11 +140,11 @@ int main(int argc, char ** argv)
     Figure* c = new Circle(Point(40.0, 50.0), 5.0);
     c -> translate(10.0, 5.0);
     c -> rotate(0.5);
-    cout << *c << endl;
+    cout << c << endl;
 
     Figure* l = new Line(Point(5.0, 7.0), Point(3.0, 2.0));
     l -> rotate(-0.2);
     l -> translate(3.0, 5.0);
-    cout << *l << endl;
+    cout << l << endl;
 */
 }
