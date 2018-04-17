@@ -25,15 +25,21 @@ public:
 };
 
 Stack::Stack(){
-    t = new Element;
+    t = NULL;
 }
 
 Stack::~Stack(){
-    delete this->t;
+    while(!empty()){
+        pop();
+    }
 }
 
 void Stack::pop(){
-    t=t->prev;
+    if (empty()) return;
+
+    Element* P = t->prev;
+    delete t;
+    t=P;
 }
 
 float Stack::top(){
@@ -41,20 +47,18 @@ float Stack::top(){
 }
 
 bool Stack::empty(){
-    if (this->top()==0) return true;
+    if (this->t==NULL) return true;
     else return false;
 }
 
 void Stack::push(float x){
     Element* A;
-    A=new Element;
     A=t;
 
     t=new Element;
     t->value=x;
     t->prev=A;
 
-    delete A;
 }
 
 /*

@@ -1,7 +1,6 @@
 #include <iostream>
 #include <math.h>
 using namespace std;
-
 class Figure
 {
     virtual ostream& output(ostream&) const = 0;
@@ -126,25 +125,112 @@ public:
     }
 };
 
+class Circle:public Figure
+{
+    Point p;
+    float r;
+    virtual ostream& output(ostream& os) const
+       {
+           return os<<"srodek "<<&p<<" promien "<<r;
+       };
+
+public:
+
+    Circle(Point _p,double _r)
+    {
+        r=_r;
+        p=_p;
+    };
+    virtual double area()
+    {
+        return 3.14*r*r;
+    };
+
+    virtual Figure* scale(double k)
+    {
+        r=r*k;
+        p.scale(k);
+        return this;
+    };
+    virtual Figure* translate(double dx, double dy)
+    {
+        p.translate(dx,dy);
+        return this;
+    };
+    virtual Figure* rotate(double a)
+    {
+        p.rotate(a);
+        return this;
+    };
+}
+ ;
+
+ class Line:public Figure
+ {
+     Point a,b;
+    virtual ostream& output(ostream& os) const
+    {
+       return os<<"Prosta przechodzi przez punkty: "<<&a<<" oraz "<<&b;
+    };
+
+public:
+    Line(Point _a,Point _b)
+    {
+        a=_a;
+        b=_b;
+    }
+    virtual double area()
+    {
+        return 0;//pole rowne 0
+    };
+        virtual Figure* scale(double k)
+    {
+        return this;//prosta jest nieskonczna.
+        //skalowanie punktow rowniez nie zmieni prostej-
+        //przesklowane liniowo punkty dalej na niej beda
+    };
+
+
+    virtual Figure* translate(double dx, double dy)
+    {
+        b.translate(dx, dy);
+        a.translate(dx, dy);
+        return this;
+    };
+    virtual Figure* rotate(double alpha)
+    {
+        //Opcja 1.rotacja jednego punktu przez ktory przechodzi prosta
+        a.rotate(alpha);
+        return this;
+    //Opcja 2. rotacja obydwu punktow
+    //a.rotate(alpha);
+    //b.rotate(-alpha);//z minusem zeby mienialo ie nachylenie prostej
+    //return this;
+
+    };
+
+
+ };
+
 int main(int argc, char ** argv)
 {
     Figure* f = new Square(Point(10.0, 20.0), 30.0);
     Figure* g = new Point(-5.0, 15.0);
+    //f->rotate(0.5);
 
     cout << f << " ma pole " << f -> area() << endl;
     cout << g << " ma pole " << g -> area() << endl;
 
-    // Napisz klasy Circle i Line powyżej tak, by poniższy kod się kompilował
+    // Napisz klasy Circle i Line powy¿ej tak, by poni¿szy kod siê kompilowa³
 
-/*
+
     Figure* c = new Circle(Point(40.0, 50.0), 5.0);
     c -> translate(10.0, 5.0);
     c -> rotate(0.5);
     cout << c << endl;
-
     Figure* l = new Line(Point(5.0, 7.0), Point(3.0, 2.0));
-    l -> rotate(-0.2);
-    l -> translate(3.0, 5.0);
+    l -> rotate(0.05);
+    l -> translate(0, 0);
     cout << l << endl;
-*/
+
 }

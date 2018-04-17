@@ -1,4 +1,5 @@
 #include <iostream>
+#undef __STRICT_ANSI__
 #include <math.h>
 using namespace std;
 
@@ -126,6 +127,92 @@ public:
     }
 };
 
+class Circle : public Figure
+{
+    Point S;
+    double r;
+
+    virtual ostream& output(ostream& os) const {
+        return os << "S" << &S << "; Promien: " << r;
+    }
+
+public:
+    Circle(Point P, double _r){
+        S=P;
+        r=_r;
+    }
+
+    virtual double area() {
+        return M_PI*r*r;
+    }
+
+    virtual Figure* scale(double k) {
+        S.scale(k);
+        r*=k;
+        return this;
+    }
+
+    virtual Figure* translate(double dx, double dy) {
+        S.translate(dx, dy);
+        return this;
+    }
+
+    virtual Figure* rotate(double alpha) {
+        S.rotate(alpha);
+        return this;
+    }
+
+};
+
+class Line : public Figure
+{
+    Point A,B;
+
+    virtual ostream& output(ostream& os) const {
+        //wzor funkcji y=ax+b
+        float a,b,c;
+        float ux = A.getX() - B.getX();
+        float uy = A.getY() - B.getY();
+        a = -uy;
+        b = ux;
+        c = -(a * A.getX() + b * A.getY());
+
+        if (c/-b<0)
+        return os << "Prosta przechodzaca przez punkty A" << &A << " i B" << &B << " o rownaniu: y = " << a/-b << "x " << c/-b;
+        else
+        return os << "Prosta przechodzaca przez punkty A" << &A << " i B" << &B << " o rownaniu: y = " << a/-b << "x +" << c/-b;
+    }
+
+public:
+    Line(Point _A, Point _B){
+        A=_A;
+        B=_B;
+    }
+
+    virtual double area() {
+        return 0;
+    }
+
+    virtual Figure* scale(double k) {
+        A.scale(k);
+        B.scale(k);
+        return this;
+    }
+
+    virtual Figure* translate(double dx, double dy) {
+        A.translate(dx, dy);
+        B.translate(dx, dy);
+        return this;
+    }
+
+    virtual Figure* rotate(double alpha) {
+        A.rotate(alpha);
+        B.rotate(alpha);
+        return this;
+    }
+
+};
+
 int main(int argc, char ** argv)
 {
     Figure* f = new Square(Point(10.0, 20.0), 30.0);
@@ -136,15 +223,16 @@ int main(int argc, char ** argv)
 
     // Napisz klasy Circle i Line powyżej tak, by poniższy kod się kompilował
 
-/*
+
     Figure* c = new Circle(Point(40.0, 50.0), 5.0);
     c -> translate(10.0, 5.0);
     c -> rotate(0.5);
     cout << c << endl;
 
     Figure* l = new Line(Point(5.0, 7.0), Point(3.0, 2.0));
+    cout << l << endl;
     l -> rotate(-0.2);
     l -> translate(3.0, 5.0);
     cout << l << endl;
-*/
+
 }
