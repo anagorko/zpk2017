@@ -1,0 +1,53 @@
+#include <iostream>
+#include <vector>
+
+using namespace std;
+
+int binary_search(vector<int> &w, int a)
+{
+    int p=0,k=w.size()-1;
+    while(p<k)
+    {
+        int m =(p+k)/2;
+        if(w[m]<a)
+        {
+            p=m+1;
+        }
+        else
+        {
+            k=m;
+        }
+    }
+    if(w[p]==a) return p;
+    else return -1;
+};
+
+
+// zwraca indeks elementu a w wektorze w lub -1 je¿eli nie ma tego elementu
+// wektor w jest uporz¹dkowany w kolejnoœci rosn¹cej
+
+int main()
+{
+    vector<int> tab;
+    for( int i=3; i<10; ++i )
+{
+   tab.push_back(i);
+   cout<<i;
+}
+
+cout<<endl;
+    cout<<binary_search(tab,5)<<endl;
+
+
+vector<int> tab2;
+    for( int j=0; j<4; ++j )
+{
+   tab2.push_back(j);
+   cout<<j;
+}
+
+cout<<endl;
+    cout<<binary_search(tab2,10);
+}
+
+
