@@ -4,8 +4,6 @@
 
 using namespace std; 
 
-const float FPS = 60;
- 
 int main(int argc, char **argv)
 {
     ALLEGRO_DISPLAY *display = NULL;
