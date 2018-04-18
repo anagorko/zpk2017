@@ -10,7 +10,17 @@
 #include <string>
 #include <iostream>
 using namespace std;
- 
+
+#include <sstream>
+
+template<typename T>
+std::string to_string(const T& obj)
+{
+    std::stringstream ss;
+    ss << obj;
+    return ss.str();
+}
+
 int main()
 {
     if(!al_init()){
