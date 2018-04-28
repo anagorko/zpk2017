@@ -1,0 +1,193 @@
+#include <iostream>
+#include <vector>
+
+using namespace std;
+class Polynomial
+{
+    vector<double> a;  // wektor współczynników
+
+public:
+    Polynomial& operator+=(const Polynomial &q);
+    const Polynomial operator+(const Polynomial &q) const;
+    const Polynomial operator*(const Polynomial &q) const;
+    Polynomial& operator*=(const Polynomial &q);
+    Polynomial& operator-=(const Polynomial &q);
+    const Polynomial operator-(const Polynomial &q) const;
+     bool operator==(const Polynomial &q) const;
+    bool operator!=(const Polynomial &q) const;
+    friend ostream& operator<<(ostream&, const Polynomial& P);
+
+    Polynomial(){  // tworzy wielomian zerowy
+        a.push_back(0);
+    }
+
+        double getA(int n) const{
+        return a.at(n);
+    }   // metoda zwracająca współczynnik przy x^n; czyli zwraca miejsce n z wektora
+
+
+    void setA(int n, double l){
+        for (int i = a.size(); i < n + 1; i++){
+            a.push_back(0);
+        }
+        a.at(n) = l;
+    }
+
+    int deg() const{
+        return a.size()-1;
+    }
+
+};
+
+Polynomial& Polynomial::operator+=(const Polynomial &q){
+    for ( int i = 0; i < q.deg()+1; i++){
+        if( i < this->deg() + 1 ){
+            this->setA(i, this->getA(i) + q.getA(i));
+        }
+        else {
+            this->setA(i, q.getA(i));
+        }
+    }
+    return *this;
+};
+
+const Polynomial Polynomial::operator+(const Polynomial &q) const{
+    Polynomial* result = new Polynomial();
+    for (int i = 0; i < q.deg() + 1; i++) {
+        if (i < this->deg() + 1){
+            result->setA(i, this->getA(i) + q.getA(i));
+        }
+        else {
+            result->setA(i, q.getA(i));
+        }
+    }
+    return *result;
+}
+
+Polynomial& Polynomial::operator -= (const Polynomial &q) {
+    for (int i = 0; i < q.deg() + 1; i++) {
+        if (i < this->deg() + 1){
+            this->setA(i, this->getA(i) - q.getA(i));
+        }
+        else {
+            this->setA(i, -1 * q.getA(i));
+        }
+    }
+    return *this;
+}
+
+const Polynomial Polynomial::operator-(const Polynomial &q) const {
+    Polynomial* result = new Polynomial();
+    for (int i = 0; i < q.deg() + 1; i++) {
+        if (i < this->deg() + 1){
+            result->setA(i, this->getA(i) - q.getA(i));
+        }
+        else {
+            result->setA(i, -1 * q.getA(i));
+        }
+    }
+    return *result;
+}
+
+Polynomial& Polynomial::operator*=(const Polynomial& q){
+    //stopień wielomianu będącego iloczynem wielomianów jest sumą ich stopni
+    a.resize(deg() + q.deg() + 1, 0);
+    Polynomial temppoly;
+    temppoly.setA(deg() + q.deg()+1,1);
+
+    for(int i = 0; i <= deg(); i++){
+            for(int j = 0; j<= q.deg(); j++){
+                double addVal = a.at(i) * q.getA(j); //wyraz pierwszego wielomianu * wyraz drugiego(najpierw zmieniają się z drugiego)
+                int addPlace =  i + j; //stopien wielomianu po mnożeniu
+                double addTemppoly = addVal + temppoly.getA(addPlace);//jeśli w wielomianie jest już wyraz o takim ^n to dodaj go też;
+                temppoly.setA(addPlace, addTemppoly); //ustaw na tym miejscu tę wartość
+            }
+
+    }
+    temppoly.setA(deg() + q.deg()+1,0); //ustaw ostatni wyraz na 0
+    *this = temppoly;
+    return *this;
+}
+
+const Polynomial Polynomial::operator*(const Polynomial &q) const{
+    Polynomial c = *this;
+    c *= q;
+    return c;
+}
+
+bool Polynomial::operator==(const Polynomial &q) const{
+    if(deg()!= q.deg()) return false;
+    else{
+        for(int i = 0; i< deg()+1;i++){
+            if(a[i] != q.getA(i))
+                return false;
+        }
+            return true;
+    }
+}
+bool Polynomial::operator!=(const Polynomial &q) const{
+    return !(*this == q);
+}
+
+ostream & operator << (ostream &os, const Polynomial& q)
+{
+    //współczynnik + potęga, idziemy od góry
+    for(int i = q.deg(); i >= 0 ;i--){
+
+        //dodać znak wszędzie, oprócz pierwszego wyrazu
+        string sign;
+        if(i < q.deg()){
+            //dodatnia -> +. gdy ujemna to '-' sam się doda
+            if(q.a[i] >= 0){
+                sign = " + ";
+            }else{
+                sign = " ";
+            }
+        }else{
+            sign = "";
+        }
+
+        //wielomian zerowy --> =0
+        if(q.deg() ==0 && q.a[i] ==0){
+            os << sign << "0" << endl;
+        }
+
+        // któraś część wielomianu st. 0-->:
+        if(i==0 && q.a[i] !=0){
+            os << sign << q.a[i] << endl;
+        }
+        // gdy x^1 chcemy po prostu x:
+        else if(i==1 && q.a[i] != 0 && q.a[i] != 1){
+            os << sign << q.a[i] << "x";
+        }
+        else if(i==1 && q.a[i] == 1){
+            os << sign << "x";
+        }
+        else {
+            //jeśli wsp= 0 to nie drukujemy
+            if(q.a[i] != 0 && q.a[i] != 1)
+                os << sign << q.a[i] << "x^" << i ;
+            if(q.a[i] == 1)
+                os << sign << "x^" << i ;
+        }
+    }
+    return os;
+}
+
+
+int main()
+{
+    Polynomial p, q;
+
+    p.setA(2,3); p.setA(1,4); p.setA(0,-5);
+    cout << p << endl;                         // wypisuje 3x^2 + 4x -5
+
+    p.setA(6,-10);
+    cout << p << endl;
+
+    q.setA(1,2); q.setA(0,3);
+    cout << q << endl;                         // wypisuje 2x + 3
+
+    // wypisuje (3x^2+4x-5)*(2x+3)=6x^3 + 17x^2 + 2x - 15
+//    cout << "(" << p << ")*("<<q<<")="<<(p*q)<<endl;*/
+}
