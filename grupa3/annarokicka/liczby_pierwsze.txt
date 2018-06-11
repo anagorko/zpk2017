@@ -1,0 +1,22 @@
+//LICZBY PIERWSZE
+#include <iostream>
+#include <cstdio>
+
+int main()
+{
+int a = 1;
+int wynik=1;
+std::cout << "Podaj liczbe od 2 do 1 000 000" <<std::endl;
+std::cin >> a;
+for(int i=1;i<=a/2; i++){
+    if (a%i==0){
+    wynik=wynik+1;
+    }
+}
+if(wynik==2){
+    std::cout<<"liczba pierwsza"<<std::endl;
+}
+else{
+    std::cout<<"nie liczba pierwsza"<<std::endl;
+}
+}1
