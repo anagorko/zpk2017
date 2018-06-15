@@ -1,0 +1,464 @@
+#include <allegro5/allegro.h> // main Allegro header
+#include <allegro5/allegro_native_dialog.h> // reader for dialogue boxes
+#include <allegro5/allegro_primitives.h> // add allegro primitives addon
+#include <iostream> // iostream
+#include <string>   // string
+#include <stdlib.h> // srand, rand
+#include <stdio.h>  // printf
+#include <vector>
+
+using namespace std;
+// =============================================================================
+// define constants
+// =============================================================================
+
+#define BOARD_WIDTH     10
+#define BOARD_HEIGHT    22
+#define HIDDEN_LINES    2
+#define MENU_WIDTH      6
+#define BLOCK_SIZE      35
+#define BORDER_WIDTH    2
+#define FPS             1.0 / 60
+#define TETROMINO_SIZE  4
+#define BOOST_SPEED     5
+#define RED             al_map_rgb(149,57,42)
+#define ORANGE          al_map_rgb(232,133,65)
+#define YELLOW          al_map_rgb(255,205,98)
+#define GREEN           al_map_rgb(125,173,76)
+#define BLUE            al_map_rgb(31,91,137)
+#define BROWN           al_map_rgb(178,142,103)
+#define OTHER           al_map_rgb(159,206,190)
+
+// =============================================================================
+// definitions
+// =============================================================================
+
+// =============================================================================
+// define Tetromino
+// =============================================================================
+
+class tetroBlock {
+    protected:
+        ALLEGRO_COLOR color;
+        int x;
+        int y;
+    public:
+        tetroBlock (ALLEGRO_COLOR blockColor, int posX, int posY) {
+            this->color = blockColor;
+            this->x = posX;
+            this->y = posY;
+            //printf("DEBUG:: Creating block (%d,%d)\n", x, y);
+        }
+
+        ALLEGRO_COLOR getColor() { return this->color; }
+
+        int getX() { return x; }
+
+        void setX(int newX) { this->x = newX; }
+
+        int getY() { return this->y; }
+
+        void setY(int newY) { this->y = newY; }
+
+        void draw() {
+            // draw block
+            al_draw_filled_rectangle(this->x,
+                          this->y,
+                          this->x + BLOCK_SIZE,
+                          this->y + BLOCK_SIZE,
+                          this->color);
+
+            // draw black border
+            al_draw_rectangle(this->x,
+                          this->y,
+                          this->x + BLOCK_SIZE,
+                          this->y + BLOCK_SIZE,
+                          al_map_rgb(255,255,255), BORDER_WIDTH);
+        }
+};
+
+class tetromino {
+    protected:
+        vector<tetroBlock*> shape;
+        tetroBlock* center;
+
+        // create shape of tetromino
+        void setShape(ALLEGRO_COLOR color, int p1, int p2, int p3, int p4, int p5, int p6, int p7, int p8, int cent) {
+            shape.insert(shape.begin(), new tetroBlock(color, p1*BLOCK_SIZE, p2*BLOCK_SIZE));
+            shape.insert(shape.begin(), new tetroBlock(color, p3*BLOCK_SIZE, p4*BLOCK_SIZE));
+            shape.insert(shape.begin(), new tetroBlock(color, p5*BLOCK_SIZE, p6*BLOCK_SIZE));
+            shape.insert(shape.begin(), new tetroBlock(color, p7*BLOCK_SIZE, p8*BLOCK_SIZE));
+
+            // set the center point of the shape
+            center = shape[cent];
+        }
+
+        void moveVertically (int direction, tetroBlock* board[BOARD_WIDTH][BOARD_HEIGHT]) {
+            // check if you can move to the left/right
+            bool canMove = true;
+
+
+            for (vector<tetroBlock*>::iterator it = shape.begin(); it < shape.end(); it++) {
+                tetroBlock* tb = *it;
+                int posX = tb->getX();
+                int posY = tb->getY();
+
+                // stop if it's end of board
+                if (posX + direction < 0 || posX + direction > (BOARD_WIDTH-1)*BLOCK_SIZE)
+                    canMove = false;
+            }
+
+            if (canMove) {
+                for (vector<tetroBlock*>::iterator it = shape.begin(); it < shape.end(); it++) {
+                    // for each block in the tetromino, move it to the left
+                    tetroBlock* tb = *it;
+                    int oldX = tb->getX();
+                    int newX = tb->getX() + direction;
+                    tb->setX(newX);
+                }
+            } else printf("DEBUG:: Cannot move vertically\n");
+        }
+
+    public:
+        void draw () {
+            // draw each block of tetromino
+            for (vector<tetroBlock*>::iterator it = shape.begin(); it < shape.end(); it++) {
+                tetroBlock* tb = *it;
+                tb->draw();
+            }
+        }
+
+        void moveLeft(tetroBlock* board[BOARD_WIDTH][BOARD_HEIGHT]) { this->moveVertically(-BLOCK_SIZE, board); }
+
+        void moveRight (tetroBlock* board[BOARD_WIDTH][BOARD_HEIGHT]) { this->moveVertically(BLOCK_SIZE, board); }
+
+        bool moveDown (int speed, tetroBlock* board[BOARD_WIDTH][BOARD_HEIGHT]){
+            // for each block check if you can move it down
+            bool canMove = true;
+            for (vector<tetroBlock*>::iterator it = shape.begin(); it < shape.end(); it++) {
+                tetroBlock* tb = *it;
+                int posX = tb->getX();
+                int posY = tb->getY();
+                // stop if it's end of board
+                if (posY + speed + BLOCK_SIZE > BOARD_HEIGHT*BLOCK_SIZE)
+                    canMove = false;
+            }
+            // if it can move then move each block
+            if (canMove) {
+                for (vector<tetroBlock*>::iterator it = shape.begin(); it < shape.end(); it++) {
+                    tetroBlock* tb = *it;
+                    int newY = tb->getY() + speed;
+                    //printf("DEBUG:: ==> move %d=>%d\n", tb->getY(), newY);
+                    tb->setY(newY);
+                    //printf("DEBUG:: ==> moved %d\n", tb->getY());
+                }
+            } else return false;
+
+            return true;
+        }
+
+        void rotateLeft (){
+        }
+
+        void rotateRight (){
+        }
+
+        vector<tetroBlock*> getTetroBlocks() { return shape; }
+};
+
+class tetroO: public tetromino {
+    public:
+        tetroO() {
+            this->setShape(RED, 3, 0, 4, 0, 3, 1, 4, 1, 0);
+        }
+};
+
+class tetroT: public tetromino {
+    public:
+        tetroT() {
+            this->setShape(ORANGE, 3, 1, 4, 0, 4, 1, 5, 1, 2);
+        }
+};
+
+class tetroS: public tetromino {
+    public:
+        tetroS() {
+            this->setShape(YELLOW, 3, 1, 4, 1, 4, 0, 5, 0, 1);
+        }
+};
+
+class tetroZ: public tetromino {
+    public:
+        tetroZ() {
+            this->setShape(GREEN, 3, 0, 4, 0, 4, 1, 5, 1, 2);
+        }
+};
+
+class tetroI: public tetromino {
+    public:
+        tetroI() {
+            this->setShape(BLUE, 3, 0, 4, 0, 5, 0, 6, 0, 1);
+        }
+};
+
+class tetroL: public tetromino {
+    public:
+        tetroL() {
+            this->setShape(BROWN, 3, 1, 4, 1, 5, 1, 5, 0, 2);
+        }
+};
+
+class tetroJ: public tetromino {
+    public:
+        tetroJ() {
+            this->setShape(OTHER, 3, 0, 3, 1, 4, 1, 5, 1, 1);
+        }
+};
+
+// =============================================================================
+// other functions
+// =============================================================================
+
+// create random tetromino
+void createRandom(tetromino& ti) {
+    // rand value
+    int i = rand() % 7;
+
+    // create random object
+    switch (i) {
+        case 0 :
+            ti = tetroO();
+            break;
+        case 1 :
+            ti = tetroT();
+            break;
+        case 2 :
+            ti = tetroS();
+            break;
+        case 3 :
+            ti = tetroZ();
+            break;
+        case 4 :
+            ti = tetroI();
+            break;
+        case 5 :
+            ti = tetroL();
+            break;
+        case 6 :
+            ti = tetroJ();
+            break;
+        default :
+            break;
+    }
+}
+
+// =============================================================================
+// define Game
+// =============================================================================
+
+class game {
+    protected:
+        tetromino currentTetro; // tetromino that will be displayed on the board
+        tetromino nextTetro;    // tetromino that will be displayed next
+        int score;
+        int level;
+        int speed;
+        vector<tetromino> listOfTetros;
+
+        void generateNextTetro() {
+            this->currentTetro = this->nextTetro;
+            createRandom(this->nextTetro);
+        }
+
+    public:
+        tetroBlock* board[BOARD_WIDTH][BOARD_HEIGHT];
+        game() {
+            // when creating new object clear all values
+            this->start();
+        }
+
+        // prepare object for a new game
+        void start() {
+            printf("DEBUG:: startGame()\n");
+            // set starting values
+            createRandom(this->currentTetro);
+            createRandom(this->nextTetro);
+            this->score = 0;
+            this->level = 1;
+            this->speed = 1;
+
+            for (int i = 0; i < BOARD_WIDTH; i++) {
+                for (int j = 0; j < BOARD_HEIGHT; j++) {
+                    board[i][j] = NULL;
+                }
+            }
+            this->drawBoard();
+        }
+
+        void printStartingValues() {
+            printf("DEBUG:: Starting values %d, %d, %d\n", this->score, this->level, this->speed);
+        }
+
+        int getSpeed() { return this->speed; }
+
+        void setSpeed(int newSpeed) { this->speed = newSpeed; }
+
+        int getScore() { return this->score; }
+
+        void setScore(int newScore) { this->score = newScore; }
+
+        int getLevel() { return this->level; }
+
+        void setLevel(int newLevel) { this->level = newLevel; }
+
+        tetromino getCurrentTetro() { return this->currentTetro; }
+
+        tetromino getNextTetro() { return this->nextTetro; }
+
+        void drawBoard() {
+            // for each block in board draw it
+            for (int i = 0; i < BOARD_WIDTH; i++) {
+                for (int j = 0; j < BOARD_HEIGHT; j++) {
+                    if (board[i][j] != NULL) board[i][j]->draw();
+                }
+            }
+            // add menu bar
+            al_draw_filled_rectangle(BOARD_WIDTH*BLOCK_SIZE,
+                                     0,
+                                     (BOARD_WIDTH+MENU_WIDTH)*BLOCK_SIZE,
+                                     BOARD_HEIGHT*BLOCK_SIZE,
+                                     al_map_rgb(243, 160, 157));
+
+            // hide first two rows
+            al_draw_filled_rectangle(0,
+                                     0,
+                                     BOARD_WIDTH*BLOCK_SIZE,
+                                     HIDDEN_LINES*BLOCK_SIZE,
+                                     al_map_rgb(243, 160, 157));
+        }
+
+        void addToBoard(tetromino& newTetro) {
+            // get list of blocks for current Tetromino
+            vector<tetroBlock*> blocks = currentTetro.getTetroBlocks();
+
+            // for each block, add it to the board
+            for (vector<tetroBlock*>::iterator it = blocks.begin(); it < blocks.end(); it++) {
+                tetroBlock* tb = *it;
+                int x = tb->getX();
+                int y = tb->getY();
+                // fix the position if it's needed
+                tb->setX((x/BLOCK_SIZE) * BLOCK_SIZE);
+                tb->setY((y/BLOCK_SIZE) * BLOCK_SIZE);
+
+                // add it to the board
+                board[x / BLOCK_SIZE][y / BLOCK_SIZE] = tb;
+            }
+
+            generateNextTetro();
+        }
+};
+
+// =============================================================================
+// main program
+// =============================================================================
+
+int main()
+{
+    // create display
+    ALLEGRO_DISPLAY *display;
+    // initialize Allegro instances
+    if(!al_init())
+        al_show_native_message_box(NULL, NULL, NULL, "Could not initialize Allegro 5", NULL, NULL);
+    if(!al_init_primitives_addon())
+       al_show_native_message_box(NULL, NULL, NULL, "Could not initialize Allegro 5 primitives", NULL, NULL);
+    if (!al_install_keyboard())
+        al_show_native_message_box(NULL, NULL, NULL, "Could not initialize Allegro 5 keyboard", NULL, NULL);
+
+    // define the display
+    display = al_create_display(BLOCK_SIZE*(BOARD_WIDTH + MENU_WIDTH), BLOCK_SIZE*BOARD_HEIGHT);
+    al_set_window_title(display, "Tetris Game");
+    al_set_window_position(display, 500, 20);
+    al_clear_to_color(al_map_rgb(255,255,255));
+    // if Allegro fails to create a display show a message box
+    if(!display)
+        al_show_native_message_box(NULL, NULL, NULL, "Could not create Allegro 5 display", NULL, NULL);
+
+    // prepare game
+    printf("DEBUG:: Create Game\n");
+    game myGame = game();
+    myGame.printStartingValues();
+
+    ALLEGRO_TIMER *timer = al_create_timer(FPS);
+    ALLEGRO_EVENT_QUEUE *eventQueue = al_create_event_queue();
+    al_register_event_source(eventQueue, al_get_keyboard_event_source());
+    al_register_event_source(eventQueue, al_get_timer_event_source(timer));
+
+    bool stop = false;
+    bool enableBoost = false;
+    bool cantMove;
+
+    // evenrything is ready, wait a moment to load graphics
+    al_flip_display();
+    al_clear_to_color(al_map_rgb(255,255,255));
+    al_rest(0.5f);
+
+    // game main loop
+    al_start_timer(timer);
+
+    while (!stop) {
+        ALLEGRO_EVENT events;
+        al_wait_for_event(eventQueue, &events);
+        tetromino current = myGame.getCurrentTetro();
+
+        if (events.type == ALLEGRO_EVENT_KEY_DOWN) {
+            switch(events.keyboard.keycode) {
+            case ALLEGRO_KEY_DOWN:
+                // we will boost speed as long as user hold the button pressed
+                enableBoost = true;
+                break;
+            case ALLEGRO_KEY_UP:
+                current.rotateLeft();
+                break;
+            case ALLEGRO_KEY_LEFT:
+                current.moveLeft(myGame.board);
+                break;
+            case ALLEGRO_KEY_RIGHT:
+                current.moveRight(myGame.board);
+                break;
+            case ALLEGRO_KEY_ESCAPE:
+                stop = true;
+                break;
+            }
+        }
+
+        if (events.type == ALLEGRO_EVENT_KEY_UP) {
+            if (events.keyboard.keycode == ALLEGRO_KEY_DOWN)
+                // user released the button so we can stop
+                enableBoost = false;
+        }
+
+        // if user pressed and hold KEY_DOWN button then boost the speed
+        if (events.type == ALLEGRO_EVENT_TIMER && enableBoost) {
+            current.moveDown(BOOST_SPEED, myGame.board);
+        }
+
+        if(!current.moveDown(myGame.getSpeed(), myGame.board)) {
+            // we cannot moveDown so we need to change the tetro
+            myGame.addToBoard(current);
+        }
+
+        current.draw();
+        myGame.drawBoard();
+
+        al_flip_display();
+        al_clear_to_color(al_map_rgb(255,255,255));
+
+    }
+
+    al_rest(0.2f);
+
+    // deallocate the memory used for the display creation
+    al_destroy_display(display);
+
+    return 0;
+}
