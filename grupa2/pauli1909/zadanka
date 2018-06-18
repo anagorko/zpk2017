@@ -39,3 +39,16 @@ int main() {
 	}else
 	cout<<b<<endl;
 }
+
+//zadanie5
+#include <iostream>
+using namespace std;
+
+int main() {
+	int a=1, b=10, c=2;
+	int h=((b^2)+((1/2*c))^2)^(1/2);
+	if (a+b>c && a+c>b && b+c>b){
+		cout<<"TAK"<<endl;
+	}else
+		cout<<"NIE"<<endl;
+}
