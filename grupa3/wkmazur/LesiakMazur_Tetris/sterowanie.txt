@@ -1,0 +1,11 @@
+Sterowanie Gracz 1:
+    Ruchy na bok: Strzałki lewo prawo
+    Ruchy w dół: Strzałka w dół,
+    Obracanie: Strzałka w górę,
+    Opuszczenie na dół: spacja.
+    
+Sterowanie Gracz 2:
+    Ruchy na bok: A - lewo, D - prawo
+    Ruchy w dół: S,
+    Obracanie: W,
+    Opuszczenie na dół: Tab.
