@@ -28,3 +28,14 @@ int main() {
 	cout<<"Obj: "<<a*b*c<<endl;
 	cout<<"Pole pow: "<<a*b*2+a*c*2+c*b*2<<endl;
 }
+//zadanie4
+#include <iostream>
+using namespace std;
+
+int main() {
+	int a=2, b=6;
+	if(a>b){
+		cout<<a<<endl;
+	}else
+	cout<<b<<endl;
+}
