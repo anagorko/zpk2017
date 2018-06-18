@@ -1,7 +1,6 @@
 #include "mainwindow.h"
 #include <QApplication>
 #include <QDebug>
-#include <field.h>
 #include <wireworldtransition.h>
 
 int main(int argc, char *argv[])
