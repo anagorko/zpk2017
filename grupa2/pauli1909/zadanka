@@ -74,3 +74,17 @@ int main() {
 	else
 	cout<<"00"<<endl;
 }
+
+//zadanie7
+#include <iostream>
+using namespace std;
+
+int main() {
+	int a=12, b=8, c=4;
+	if(a>b){
+		cout<<"ilosc krzesel: "<<a/c*2 + (b-2*c)/c*2<<endl;
+	}
+	else
+	cout<<"ilosc krzesel: "<<b/c*2 + (a-2*c)/c*2<<endl;
+	
+}
