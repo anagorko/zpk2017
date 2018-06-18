@@ -3,7 +3,7 @@
 using namespace std;
 
 int main() {
-	int a,b, c;
+	int a, b, c;
 cin >>a;
 cin>>b;
 cin>>c;
@@ -87,4 +87,21 @@ int main() {
 	else
 	cout<<"ilosc krzesel: "<<b/c*2 + (a-2*c)/c*2<<endl;
 	
+}
+//zadanie8
+#include <iostream>
+using namespace std;
+
+int main() {
+	string tel;
+    int urodziny, wynik, i;
+    cin>>tel>>urodziny;
+    i = tel[8] - 48; // konwersja string na int
+    i=i*2;
+     i=i+5;
+    i=i*50;
+    i=i+1768;
+    wynik=i-urodziny;
+    cout <<wynik;
+    
 }
