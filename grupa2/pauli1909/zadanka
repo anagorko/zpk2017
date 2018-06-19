@@ -122,4 +122,16 @@ int main() {
  
 }
 
+#include <iostream>
+using namespace std;
+
+int main() {
+	int a, b, k, j;
+	cin>> a>>b>>k;
+	j=0;
+	for(a; a <= b; a++){
+		if(a%k==0) j++;
+	}
+	cout << j;
+	}
 
