@@ -105,3 +105,21 @@ int main() {
     cout <<wynik;
     
 }
+
+//zadanie9
+
+#include <iostream>
+using namespace std;
+ 
+int main() {
+    int x;
+    char a;
+    cin >> x >> a;
+    int w = x * 16+(a-55);
+ 
+    cout<<w<<endl;
+    cout<<(char)w<<endl;
+ 
+}
+
+
